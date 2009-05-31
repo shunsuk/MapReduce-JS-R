@@ -1,0 +1,34 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <title>map reduce</title>
+    <%= javascript_include_tag :defaults %>
+    <%= javascript_include_tag 'map_reduce' %>
+    <%= stylesheet_link_tag 'style' %>
+  </head>
+  <body>
+    <div id="status">stop</div>
+    <div id="start">
+      <%= link_to_remote "client",
+            :url => {:action => "client_size", :model => "word_count"},
+            :update => "status",
+            :loading => "$('status').innerHTML = 'waiting...'",
+            :complete => "" %>
+      <br />
+      <%= link_to_remote "start",
+            :url => {:action => "start"},
+            :update => "status",
+            :loading => "$('status').innerHTML = 'waiting...';",
+            :complete => "" %>
+      <br />
+      <%= link_to_remote "reset",
+            :url => {:action => "reset"},
+            :update => "status",
+            :loading => "$('status').innerHTML = 'waiting...';",
+            :complete => "" %>
+    </div>
+  </body>
+</html>

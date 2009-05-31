@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <title>word count</title>
+    <%= javascript_include_tag :defaults %>
+    <%= javascript_include_tag 'map_reduce' %>
+    <%= stylesheet_link_tag 'style' %>
+    <script type="text/javascript">
+      //<![CDATA[
+        function map(key, value) {
+          var words = value.split(" ");
+          for (var i = 0; i < words.length; i++) {
+            this.emit(words[i], "1");
+          }
+        }
+
+        function reduce(key, value) {
+          var count = Math.ceil(value.length / 2) + '';
+          this.emit(key, count);
+        }
+
+        function start() {
+          var mapReduce = new MapReduce({
+            model: 'word_count',
+            map: map,
+            reduce: reduce,
+
+            complete: function(result) {
+              var res = result['result'];
+
+              var resultf = 'result:<br />';
+              for (var key in res) {
+                resultf += key + ' : ' + res[key] + '<br />';
+              }
+              updateLog(resultf);
+
+              $('status').innerHTML = 'complete';
+            },
+
+            beforeMap: function(response) {
+              updateLog('response (initial):<br />' + response);
+            },
+
+            afterMap: function(request) {
+              updateLog('request (result of map):<br />' + request);
+            },
+
+            beforeReduce: function(response) {
+              updateLog('response (result of shuffle):<br />' + response);
+            },
+
+            afterReduce: function(request) {
+              updateLog('request (result of reduce):<br />' + request);
+            },
+
+            beforeComplete: function(response) {
+              updateLog('response (final):<br />' + response);
+            }
+          });
+
+          mapReduce.start();
+
+          $('prepare').innerHTML = '';
+          $('log').innerHTML = '';
+        }
+
+        function updateLog(text) {
+          $('log').innerHTML = '<p>' + text + '</p>' + $('log').innerHTML;
+        }
+      //]]>
+    </script>
+  </head>
+  <body>
+    <div id="status">stop</div>
+    <div id="prepare">
+      <%= link_to_function "prepare", "start()" %>
+    </div>
+    <div id="log"></div>
+  </body>
+</html>
